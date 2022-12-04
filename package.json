@@ -1,0 +1,16 @@
+{
+  "name": "mingwall",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@taqueria/plugin-core": "^0.24.2",
+    "@taqueria/plugin-ligo": "^0.24.2"
+  }
+}
