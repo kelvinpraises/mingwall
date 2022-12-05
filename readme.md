@@ -7,12 +7,7 @@ This contract is the Mingwall Profile. It contains a profile of the user's game 
 
 ## How to use
 
-To install packages and start development server, run:
-
-```sh
-yarn install
-yarn run dev
-```
+Coming soon!
 
 ## Technologies
 
