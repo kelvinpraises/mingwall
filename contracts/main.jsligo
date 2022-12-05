@@ -1,0 +1,146 @@
+#import "errors.jsligo" "Errors"
+#import "storage.jsligo" "Storage"
+#import "parameter.jsligo" "Parameter"
+
+export type storage = Storage.t;
+export type parameter = Parameter.t;
+export type return_ = [list<operation>, storage];
+
+const check_signature = (pk: key, signed: signature, msg: bytes) : bool => {
+  return Crypto.check(pk, signed, msg);
+};
+
+const current_addr = Tezos.get_self_address();
+
+/* DONE! */
+const change_owner = (params:Parameter.changeOwnerParams, store:storage) : return_ => {
+  const {owner, key, tickets, nonce, current_id} = store;
+  if (Tezos.get_source() != owner) { return failwith(Errors.onlyOwner); }
+  else { 
+    return [list([]), {owner:params.address, key:params.key, tickets:tickets, nonce:nonce, current_id:current_id}]; 
+  };
+};
+
+/* DONE! */
+const save_achievement = (params:Parameter.saveAchievementParams, store:storage) : return_ => {
+  const {owner, key, tickets, nonce, current_id} = store;
+  
+  const param = () => {
+    const {ticket, nonce, signature} = params;
+    const params_nonce = nonce;
+    return [ticket, params_nonce, signature]; 
+  };
+
+  const [ticket, params_nonce, signature] = param()
+
+  const check_nonce = (): bool => {return params_nonce == nonce};
+
+  if (!check_nonce()) { return failwith(Errors.invalidNonce); }
+  else { 
+    const packed = p => Bytes.pack(p);
+
+    const nonce_bytes : bytes = packed(nonce);
+    const wallet_bytes : bytes = packed(current_addr);
+
+    const mixed_bytes = Bytes.concat(nonce_bytes, wallet_bytes);
+    
+    const is_sig: bool = check_signature(key, signature, mixed_bytes);
+
+    if (!is_sig) { return failwith(Errors.onlyAuth); }
+    else {
+      const newTickets = Big_map.add(current_id, ticket, tickets);
+      return [list([]), {owner:owner, key:key, tickets:newTickets, nonce:nonce + (1 as nat), current_id:current_id + (1 as nat) }];
+    };
+  };
+};
+
+/* DONE! */
+const transfer_FA = (params:Parameter.transferParams, store:storage) : return_ => {
+  const {owner, key, tickets, nonce, current_id} = store;
+  if (Tezos.get_source() != owner) { return failwith(Errors.onlyOwner); }
+
+  else { 
+    const contract = match(Tezos.get_entrypoint_opt("%transfer", params.contract as address), {
+      Some: contract => contract,
+      None: () => failwith(Errors.noContract)
+    });
+
+    type x = | ["Transfer", Parameter.transferFAParams];
+
+    const trasferParams: Parameter.transferFAParams = [current_addr as address, [params.to as address, params.value as nat]];
+    const op = Tezos.transaction(Transfer(trasferParams), 0 as tez, contract);
+    return [list([op]), {owner:owner, key:key, tickets:tickets, nonce:nonce, current_id:current_id}];
+  };
+};
+
+/* DONE! */
+const relay_transfer_FA = (params:Parameter.relayTransferParams, store:storage) : return_ => {
+  const {owner, key, tickets, nonce, current_id} = store;
+
+  const check_nonce = (): bool => {return params.nonce == nonce};
+
+  if (!check_nonce()) { return failwith(Errors.invalidNonce); }
+  else{
+    const packed = p => Bytes.pack(p);
+
+    const contract_bytes : bytes = packed(params.contract);
+    const to_bytes : bytes = packed(params.to);
+    const value_bytes : bytes = packed(params.value);
+
+    const nonce_bytes : bytes = packed(nonce);
+    const wallet_bytes : bytes = packed(current_addr);
+
+    const contract_to_bytes = Bytes.concat(contract_bytes, to_bytes);
+    const mixed_value_bytes = Bytes.concat(contract_to_bytes, value_bytes);
+    const mixed_nonce_bytes = Bytes.concat(mixed_value_bytes, nonce_bytes);
+    const mixed_wallet_bytes = Bytes.concat(mixed_value_bytes, nonce_bytes);
+    
+    const is_sig: bool = check_signature(key, params.signature, mixed_wallet_bytes);
+
+    if (!is_sig) { return failwith(Errors.onlyAuth); }
+    else { 
+      const contract = match(Tezos.get_entrypoint_opt("%transfer", params.contract as address), {
+        Some: contract => contract,
+        None: () => failwith(Errors.noContract)
+      });
+
+      type x = | ["Transfer", Parameter.transferFAParams];
+
+      const trasferParams: Parameter.transferFAParams = [current_addr as address, [params.to as address, params.value as nat]];
+      const op = Tezos.transaction(Transfer(trasferParams), 0 as tez, contract);
+      return [list([op]), {owner:owner, key:key, tickets:tickets, nonce:nonce + (1 as nat), current_id:current_id}];
+    };
+  };
+};
+
+/* DONE! */
+const update_profile = (params:ticket<bytes>, store:storage) : return_ => {
+  const {owner, key, tickets, nonce, current_id} = store;
+  if (Tezos.get_source() != owner) { return failwith(Errors.onlyOwner); }
+  else { 
+    const packed = p => Bytes.pack(p);
+
+    const profile = "{" + "name: " + "%name" + "picture: " + "%picture" + "}"
+
+    const my_ticket = Tezos.create_ticket(packed(profile), 1 as nat);
+    const updated_ticket = Big_map.update((0 as nat), Some(my_ticket), tickets);
+    return [list([]), {owner:owner, key:key, tickets:updated_ticket, nonce:nonce, current_id:current_id }]; 
+  };
+};
+
+const reset = (store:storage) : return_ => {
+  const {owner, key, tickets, nonce, current_id} = store;
+  if (Tezos.get_source() != owner) { return failwith(Errors.onlyOwner); }
+  else { return [list([]), {owner:owner, key:key, tickets:tickets, nonce:nonce, current_id:current_id }]; };
+};
+
+const main = (action:parameter, store:storage) : return_ => {
+  match (action, {
+    ChangeOwner: p => change_owner(p, store),
+    SaveAchievement: p => save_achievement(p, store),
+    Transfer: p => transfer_FA(p, store),
+    RelayTransfer: p => relay_transfer_FA(p, store),
+    UpdateProfile: p => update_profile(p, store),
+    Reset: () => reset(store),
+  })
+};

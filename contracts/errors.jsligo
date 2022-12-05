@@ -1,1 +1,4 @@
-let onlyAdmin : string = "Only admin"
+export const onlyOwner : string = "Only owner";
+export const onlyAuth : string = "Only authorized callers";
+export const noContract : string = "Contract does not match"
+export const invalidNonce : string = "Nonce does not match current nonce"

@@ -1,0 +1,9 @@
+export type t = 
+/* @layout:comb */
+{
+  owner: address,
+  key: key,
+  tickets: big_map<nat, ticket<bytes>>,
+  nonce: nat,
+  current_id: nat,
+};

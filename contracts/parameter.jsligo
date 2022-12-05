@@ -1,0 +1,34 @@
+export type changeOwnerParams = {
+  address: address,
+  key: key,
+};
+
+export type saveAchievementParams = {
+  ticket: ticket<bytes>,
+  nonce: nat,
+  signature: signature
+};
+
+export type transferFAParams = michelson_pair<[address, "from", michelson_pair<[address, "to", nat, "value"]>, ""]>;
+
+export type transferParams = {
+  contract: address,
+  to: address,
+  value: nat,
+};
+
+export type relayTransferParams = {
+  contract: address,
+  to: address,
+  value: nat,
+  nonce: nat,
+  signature: signature
+};
+
+export type t =
+| ["ChangeOwner", changeOwnerParams]
+| ["SaveAchievement", saveAchievementParams]
+| ["Transfer", transferParams]
+| ["RelayTransfer", relayTransferParams]
+| ["UpdateProfile", ticket<bytes>]
+| ["Reset"];
