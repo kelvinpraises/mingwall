@@ -11,6 +11,7 @@
   "description": "",
   "devDependencies": {
     "@taqueria/plugin-core": "^0.24.2",
-    "@taqueria/plugin-ligo": "^0.24.2"
+    "@taqueria/plugin-ligo": "^0.24.2",
+    "@taqueria/plugin-tezos-client": "^0.24.2"
   }
 }

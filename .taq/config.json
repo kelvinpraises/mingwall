@@ -8,10 +8,36 @@
         {
             "name": "@taqueria/plugin-ligo",
             "type": "npm"
+        },
+        {
+            "name": "@taqueria/plugin-tezos-client",
+            "type": "npm"
         }
     ],
     "contractsDir": "contracts",
     "artifactsDir": "artifacts",
+    "contracts": {
+        "mingwall.jsligo": {
+            "sourceFile": "mingwall.jsligo",
+            "hash": "5737454d4dd7c3947452a5d2003c30353b62f19a6d73f98ad830a187574b3751"
+        },
+        "mingwall.storages.jsligo": {
+            "sourceFile": "mingwall.storages.jsligo",
+            "hash": "5737454d4dd7c3947452a5d2003c30353b62f19a6d73f98ad830a187574b3751"
+        },
+        "mingwall.storageList.jsligo": {
+            "sourceFile": "mingwall.storageList.jsligo",
+            "hash": "5737454d4dd7c3947452a5d2003c30353b62f19a6d73f98ad830a187574b3751"
+        },
+        "pokeGame.parameters.jsligo": {
+            "sourceFile": "pokeGame.parameters.jsligo",
+            "hash": "5737454d4dd7c3947452a5d2003c30353b62f19a6d73f98ad830a187574b3751"
+        },
+        "mingwall.parameters.jsligo": {
+            "sourceFile": "mingwall.parameters.jsligo",
+            "hash": "5737454d4dd7c3947452a5d2003c30353b62f19a6d73f98ad830a187574b3751"
+        }
+    },
     "network": {
         "ghostnet": {
             "label": "ghostnet",
@@ -47,19 +73,5 @@
         "john": "3_000_000_000",
         "jane": "3_000_000_000",
         "joe": "3_000_000_000"
-    },
-    "contracts": {
-        "mingwall.jsligo": {
-            "sourceFile": "mingwall.jsligo",
-            "hash": "5737454d4dd7c3947452a5d2003c30353b62f19a6d73f98ad830a187574b3751"
-        },
-        "mingwall.storages.jsligo": {
-            "sourceFile": "mingwall.storages.jsligo",
-            "hash": "5737454d4dd7c3947452a5d2003c30353b62f19a6d73f98ad830a187574b3751"
-        },
-        "mingwall.storageList.jsligo": {
-            "sourceFile": "mingwall.storageList.jsligo",
-            "hash": "5737454d4dd7c3947452a5d2003c30353b62f19a6d73f98ad830a187574b3751"
-        }
     }
 }
